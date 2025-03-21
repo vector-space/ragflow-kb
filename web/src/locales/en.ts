@@ -553,6 +553,7 @@ This auto-tag feature enhances retrieval by adding another layer of domain-speci
         'Please enter your current password to change your password.',
       model: 'Model providers',
       modelDescription: 'Set the model parameter and API KEY here.',
+      admin: 'User Admin',
       team: 'Team',
       system: 'System',
       logout: 'Log out',

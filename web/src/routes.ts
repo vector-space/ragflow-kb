@@ -119,6 +119,10 @@ const routes = [
             path: '/user-setting/api',
             component: '@/pages/user-setting/setting-api',
           },
+          {
+            path: '/user-setting/admin',
+            component: '@/pages/user-setting/setting-admin',
+          },
         ],
       },
       {

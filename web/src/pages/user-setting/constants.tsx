@@ -1,4 +1,5 @@
 import {
+  AdminIcon,
   ApiIcon,
   LogOutIcon,
   ModelProviderIcon,
@@ -18,6 +19,7 @@ export const UserSettingIconMap = {
   [UserSettingRouteKey.Team]: <TeamIcon />,
   [UserSettingRouteKey.Logout]: <LogOutIcon />,
   [UserSettingRouteKey.Api]: <ApiIcon />,
+  [UserSettingRouteKey.Admin]: <AdminIcon />,
 };
 
 export * from '@/constants/setting';
