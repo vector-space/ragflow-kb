@@ -130,14 +130,28 @@ def register_page(page_path):
 
 pages_dir = [
     Path(__file__).parent,
-    Path(__file__).parent.parent / "api" / "apps",
-    Path(__file__).parent.parent / "api" / "apps" / "sdk",
+    # Path(__file__).parent.parent / "api" / "apps",
+    # Path(__file__).parent.parent / "api" / "apps" / "sdk",
 ]
+print('pages_dir', pages_dir)
 
 client_urls_prefix = [
     register_page(path) for dir in pages_dir for path in search_pages_path(dir)
 ]
+# only use the process to load blueprint, the returned value is useless
 
+from flask import url_for, jsonify
+@app.route('/')
+def index():
+    routes = []
+    for rule in app.url_map.iter_rules():
+        try:
+            # if "GET" in rule.methods:
+            url = url_for(rule.endpoint)
+            routes.append((url, rule.endpoint))
+        except Exception as e:
+            print(e.args)
+    return jsonify(routes)
 
 @login_manager.request_loader
 def load_user(web_request):
