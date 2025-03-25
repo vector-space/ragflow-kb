@@ -46,6 +46,20 @@ export const useFetchUserInfo = (): ResponseGetType<IUserInfo> => {
   return { data, loading };
 };
 
+export const useFetchUserList = (): { data: IUserInfo[]; loading: boolean } => {
+  const { data, isFetching: loading } = useQuery({
+    queryKey: ['userList'],
+    initialData: [],
+    gcTime: 0,
+    queryFn: async () => {
+      const { data } = await userService.user_list();
+      return data?.code === 0 ? data.data : [];
+    },
+  });
+
+  return { data: data as IUserInfo[], loading };
+};
+
 export const useFetchTenantInfo = (
   showEmptyModelWarn = false,
 ): ResponseGetType<ITenantInfo> => {

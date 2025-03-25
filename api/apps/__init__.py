@@ -90,6 +90,15 @@ Session(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+from flask_login import AnonymousUserMixin
+class AnonymousUser(AnonymousUserMixin):
+    def __init__(self):
+        self.is_superuser = False
+    def __repr__(self):
+        return f"<AnonymousUser>"
+login_manager.anonymous_user = AnonymousUser
+
+
 commands.register_commands(app)
 
 
@@ -172,7 +181,6 @@ def load_user(web_request):
             return None
     else:
         return None
-
 
 @app.teardown_request
 def _db_close(exc):

@@ -8,6 +8,7 @@ const {
   register,
   setting,
   user_info,
+  user_list,
   tenant_info,
   factories_list,
   llm_list,
@@ -44,6 +45,10 @@ const methods = {
   },
   user_info: {
     url: user_info,
+    method: 'get',
+  },
+  user_list: {
+    url: user_list,
     method: 'get',
   },
   get_tenant_info: {

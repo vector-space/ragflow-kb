@@ -41,7 +41,7 @@ API_KEY = None
 PARSERS = None
 HOST_IP = None
 HOST_PORT = None
-SECRET_KEY = None
+SECRET_KEY = 'there should be some thing here, not None'
 FACTORY_LLM_INFOS = None
 
 DATABASE_TYPE = os.getenv("DB_TYPE", 'mysql')

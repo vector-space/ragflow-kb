@@ -233,7 +233,7 @@ class BaseModel(Model):
                         cls.getter_by(f"{order_by}").asc())
             return [query_record for query_record in query_records]
         else:
-            return []
+            return [q for q in cls.select()]
 
     @classmethod
     def insert(cls, __data=None, **insert):

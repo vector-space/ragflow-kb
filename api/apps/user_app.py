@@ -38,6 +38,7 @@ from api.utils import (
     datetime_format,
 )
 from api.db import UserTenantRole, FileType
+from api.db.db_models import User
 from api import settings
 from api.db.services.user_service import UserService, TenantService, UserTenantService
 from api.db.services.file_service import FileService
@@ -456,6 +457,14 @@ def user_profile():
               description: User email.
     """
     return get_json_result(data=current_user.to_dict())
+
+
+@manager.route("/list", methods=["GET"])
+@login_required
+def user_list():
+    if not current_user.is_superuser:
+      return get_json_result(settings.RetCode.FORBIDDEN, message='superuser permission required', data=[])
+    return get_json_result(data=[user.to_dict() for user in User.query()])      
 
 
 def rollback_user_registration(user_id):
