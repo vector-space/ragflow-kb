@@ -1,8 +1,8 @@
 import { useTranslate } from '@/hooks/common-hooks';
-import { useFetchUserInfo, useSaveSetting } from '@/hooks/user-setting-hooks';
+import { useFetchUserInfo } from '@/hooks/user-setting-hooks';
 import { TeamOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Button, Card, Flex, Space } from 'antd';
-import { useValidateSubmittable } from '../hooks';
+// import { useValidateSubmittable } from '../hooks';
 import { useRegisterUser } from './hooks';
 import styles from './index.less';
 import RegisterModal from './register-model';
@@ -12,8 +12,8 @@ const iconStyle = { fontSize: 20, color: '#1677ff' };
 
 const UserSettingAdmin = () => {
   const { data: userInfo, loading } = useFetchUserInfo();
-  const { saveSetting, loading: submitLoading } = useSaveSetting();
-  const { form, submittable } = useValidateSubmittable();
+  // const { saveSetting, loading: submitLoading } = useSaveSetting();
+  // const { form, submittable } = useValidateSubmittable();
   const { t } = useTranslate('setting');
 
   const {

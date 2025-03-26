@@ -572,12 +572,8 @@ def user_add():
           type: object
     """
 
-    if not settings.REGISTER_ENABLED:
-        return get_json_result(
-            data=False,
-            message="User registration is disabled!",
-            code=settings.RetCode.OPERATING_ERROR,
-        )
+    if not current_user.is_superuser:
+        return get_json_result(settings.RetCode.FORBIDDEN, message='superuser permission required', data=[])
 
     req = request.json
     email_address = req["email"]

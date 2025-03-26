@@ -2,7 +2,10 @@ import { Domain } from '@/constants/common';
 import { useTranslate } from '@/hooks/common-hooks';
 import { useLogout } from '@/hooks/login-hooks';
 import { useSecondPathName } from '@/hooks/route-hook';
-import { useFetchSystemVersion } from '@/hooks/user-setting-hooks';
+import {
+  useFetchSystemVersion,
+  useFetchUserInfo,
+} from '@/hooks/user-setting-hooks';
 import type { MenuProps } from 'antd';
 import { Flex, Menu } from 'antd';
 import React, { useEffect, useMemo } from 'react';
@@ -22,6 +25,7 @@ const SideBar = () => {
   const { logout } = useLogout();
   const { t } = useTranslate('setting');
   const { version, fetchSystemVersion } = useFetchSystemVersion();
+  const { data: userInfo } = useFetchUserInfo(); // get user info in order to determine whether the current user is an admin
 
   useEffect(() => {
     if (location.host !== Domain) {
@@ -52,7 +56,18 @@ const SideBar = () => {
     } as MenuItem;
   }
 
-  const items: MenuItem[] = Object.values(UserSettingRouteKey).map((value) =>
+  // 过滤菜单项的逻辑
+  const filteredRouteKeys = useMemo(() => {
+    const baseKeys = Object.values(UserSettingRouteKey);
+
+    // 如果用户不是管理员，过滤掉Admin项
+    if (!userInfo?.is_superuser) {
+      return baseKeys.filter((key) => key !== UserSettingRouteKey.Admin);
+    }
+    return baseKeys;
+  }, [userInfo?.is_superuser]); // 依赖用户权限状态
+
+  const items: MenuItem[] = filteredRouteKeys.map((value) =>
     getItem(value, value, UserSettingIconMap[value]),
   );
 

@@ -6,7 +6,6 @@ import type { TableProps } from 'antd';
 import { Button, Table, Tag } from 'antd';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
-// import { UserRole } from '../constants';
 // import { useHandleDeleteUser } from './hooks';
 
 const ColorMap = {
