@@ -551,6 +551,7 @@ General：实体和关系提取提示来自 GitHub - microsoft/graphrag：基于
       passwordDescription: '请输入您当前的密码以更改您的密码。',
       model: '模型提供商',
       modelDescription: '在此设置模型参数和 API KEY。',
+
       admin: '用户管理',
       adminDescription: '以管理员身份在此进行用户管理。',
       userList: '用户列表',
@@ -559,6 +560,9 @@ General：实体和关系提取提示来自 GitHub - microsoft/graphrag：基于
       normalUser: '普通用户',
       register: '注册',
       nickname: '用户名',
+      sureDeleteUser: '确定要删除该用户吗？',
+      deleted: '删除成功',
+
       team: '团队',
       system: '系统',
       logout: '登出',

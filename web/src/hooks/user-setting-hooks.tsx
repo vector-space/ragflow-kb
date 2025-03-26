@@ -74,7 +74,7 @@ export const useDeleteUser = () => {
     mutationFn: async (userId: string) => {
       const { data } = await deleteUser(userId);
       if (data.code === 0) {
-        message.success(t('message.deleted'));
+        message.success(t('setting.deleted'));
         queryClient.invalidateQueries({ queryKey: ['userList'] });
       }
       return data?.data ?? [];
