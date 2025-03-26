@@ -1,7 +1,7 @@
 import { Authorization } from '@/constants/authorization';
 import userService from '@/services/user-service';
 import authorizationUtil, { redirectToLogin } from '@/utils/authorization-util';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Form, message } from 'antd';
 import { FormInstance } from 'antd/lib';
 import { useEffect, useState } from 'react';
@@ -52,6 +52,7 @@ export const useLogin = () => {
 
 export const useRegister = () => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient(); // get instance
 
   const {
     data,
@@ -67,8 +68,15 @@ export const useRegister = () => {
       const { data = {} } = await userService.register(params);
       if (data.code === 0) {
         message.success(t('message.registered'));
-      } else if (data.message && data.message.includes('registration is disabled')) {
-        message.error(t('message.registerDisabled') || 'User registration is disabled');
+        // invalidate userList queries so useFetchUserList will automatically refetch data
+        queryClient.invalidateQueries({ queryKey: ['userList'] });
+      } else if (
+        data.message &&
+        data.message.includes('registration is disabled')
+      ) {
+        message.error(
+          t('message.registerDisabled') || 'User registration is disabled',
+        );
       }
       return data.code;
     },
