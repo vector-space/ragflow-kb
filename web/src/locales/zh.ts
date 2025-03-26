@@ -557,6 +557,8 @@ General：实体和关系提取提示来自 GitHub - microsoft/graphrag：基于
       registerDate: '注册日期',
       superUser: '管理员',
       normalUser: '普通用户',
+      register: '注册',
+      nickname: '用户名',
       team: '团队',
       system: '系统',
       logout: '登出',
