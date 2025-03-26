@@ -115,6 +115,9 @@ const methods = {
 
 const userService = registerServer<keyof typeof methods>(methods, request);
 
+export const deleteUser = (userId: string) =>
+  request.delete(api.deleteUser(userId));
+
 export const listTenantUser = (tenantId: string) =>
   request.get(api.listTenantUser(tenantId));
 

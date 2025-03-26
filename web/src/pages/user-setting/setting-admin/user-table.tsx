@@ -1,4 +1,5 @@
-import { useFetchUserList } from '@/hooks/user-setting-hooks';
+import { useShowDeleteConfirm } from '@/hooks/common-hooks';
+import { useDeleteUser, useFetchUserList } from '@/hooks/user-setting-hooks';
 import { IUserInfo } from '@/interfaces/database/user-setting';
 import { formatDate } from '@/utils/date';
 import { DeleteOutlined } from '@ant-design/icons';
@@ -6,7 +7,6 @@ import type { TableProps } from 'antd';
 import { Button, Table, Tag } from 'antd';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
-// import { useHandleDeleteUser } from './hooks';
 
 const ColorMap = {
   super: 'red',
@@ -15,8 +15,18 @@ const ColorMap = {
 
 const UserTable = () => {
   const { data, loading } = useFetchUserList();
-  //   const { handleDeleteUser } = useHandleDeleteUser();
   const { t } = useTranslation();
+  const { deleteUser } = useDeleteUser();
+  const showDeleteConfirm = useShowDeleteConfirm();
+
+  const handleDelete = (userId: string) => {
+    showDeleteConfirm({
+      title: t('setting.sureDeleteUser'),
+      onOk: async () => {
+        await deleteUser(userId);
+      },
+    });
+  };
 
   const columns: TableProps<IUserInfo>['columns'] = [
     {
@@ -55,8 +65,9 @@ const UserTable = () => {
       render: (_, record) => (
         <Button
           type="text"
-          //   onClick={() => handleDeleteUser(record.user_id)}
+          onClick={() => handleDelete(record.id)}
           disabled={record.is_superuser}
+          // danger
         >
           <DeleteOutlined />
         </Button>
@@ -66,7 +77,7 @@ const UserTable = () => {
 
   return (
     <Table<IUserInfo>
-      rowKey="user_id"
+      rowKey="id"
       columns={columns}
       dataSource={data}
       loading={loading}

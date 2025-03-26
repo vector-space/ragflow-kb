@@ -12,6 +12,7 @@ import userService, {
   addTenantUser,
   agreeTenant,
   deleteTenantUser,
+  deleteUser,
   listTenant,
   listTenantUser,
 } from '@/services/user-service';
@@ -58,6 +59,29 @@ export const useFetchUserList = (): { data: IUserInfo[]; loading: boolean } => {
   });
 
   return { data: data as IUserInfo[], loading };
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  const {
+    data,
+    isPending: loading,
+    mutateAsync,
+  } = useMutation({
+    mutationKey: ['deleteUser'],
+    mutationFn: async (userId: string) => {
+      const { data } = await deleteUser(userId);
+      if (data.code === 0) {
+        message.success(t('message.deleted'));
+        queryClient.invalidateQueries({ queryKey: ['userList'] });
+      }
+      return data?.data ?? [];
+    },
+  });
+
+  return { data, loading, deleteUser: mutateAsync };
 };
 
 export const useFetchTenantInfo = (

@@ -116,191 +116,191 @@ def login():
         )
 
 
-@manager.route("/github_callback", methods=["GET"])  # noqa: F821
-def github_callback():
-    """
-    GitHub OAuth callback endpoint.
-    ---
-    tags:
-      - OAuth
-    parameters:
-      - in: query
-        name: code
-        type: string
-        required: true
-        description: Authorization code from GitHub.
-    responses:
-      200:
-        description: Authentication successful.
-        schema:
-          type: object
-    """
-    import requests
+# @manager.route("/github_callback", methods=["GET"])  # noqa: F821
+# def github_callback():
+#     """
+#     GitHub OAuth callback endpoint.
+#     ---
+#     tags:
+#       - OAuth
+#     parameters:
+#       - in: query
+#         name: code
+#         type: string
+#         required: true
+#         description: Authorization code from GitHub.
+#     responses:
+#       200:
+#         description: Authentication successful.
+#         schema:
+#           type: object
+#     """
+#     import requests
 
-    res = requests.post(
-        settings.GITHUB_OAUTH.get("url"),
-        data={
-            "client_id": settings.GITHUB_OAUTH.get("client_id"),
-            "client_secret": settings.GITHUB_OAUTH.get("secret_key"),
-            "code": request.args.get("code"),
-        },
-        headers={"Accept": "application/json"},
-    )
-    res = res.json()
-    if "error" in res:
-        return redirect("/?error=%s" % res["error_description"])
+#     res = requests.post(
+#         settings.GITHUB_OAUTH.get("url"),
+#         data={
+#             "client_id": settings.GITHUB_OAUTH.get("client_id"),
+#             "client_secret": settings.GITHUB_OAUTH.get("secret_key"),
+#             "code": request.args.get("code"),
+#         },
+#         headers={"Accept": "application/json"},
+#     )
+#     res = res.json()
+#     if "error" in res:
+#         return redirect("/?error=%s" % res["error_description"])
 
-    if "user:email" not in res["scope"].split(","):
-        return redirect("/?error=user:email not in scope")
+#     if "user:email" not in res["scope"].split(","):
+#         return redirect("/?error=user:email not in scope")
 
-    session["access_token"] = res["access_token"]
-    session["access_token_from"] = "github"
-    user_info = user_info_from_github(session["access_token"])
-    email_address = user_info["email"]
-    users = UserService.query(email=email_address)
-    user_id = get_uuid()
-    if not users:
-        # User isn't try to register
-        try:
-            try:
-                avatar = download_img(user_info["avatar_url"])
-            except Exception as e:
-                logging.exception(e)
-                avatar = ""
-            users = user_register(
-                user_id,
-                {
-                    "access_token": session["access_token"],
-                    "email": email_address,
-                    "avatar": avatar,
-                    "nickname": user_info["login"],
-                    "login_channel": "github",
-                    "last_login_time": get_format_time(),
-                    "is_superuser": False,
-                },
-            )
-            if not users:
-                raise Exception(f"Fail to register {email_address}.")
-            if len(users) > 1:
-                raise Exception(f"Same email: {email_address} exists!")
+#     session["access_token"] = res["access_token"]
+#     session["access_token_from"] = "github"
+#     user_info = user_info_from_github(session["access_token"])
+#     email_address = user_info["email"]
+#     users = UserService.query(email=email_address)
+#     user_id = get_uuid()
+#     if not users:
+#         # User isn't try to register
+#         try:
+#             try:
+#                 avatar = download_img(user_info["avatar_url"])
+#             except Exception as e:
+#                 logging.exception(e)
+#                 avatar = ""
+#             users = user_register(
+#                 user_id,
+#                 {
+#                     "access_token": session["access_token"],
+#                     "email": email_address,
+#                     "avatar": avatar,
+#                     "nickname": user_info["login"],
+#                     "login_channel": "github",
+#                     "last_login_time": get_format_time(),
+#                     "is_superuser": False,
+#                 },
+#             )
+#             if not users:
+#                 raise Exception(f"Fail to register {email_address}.")
+#             if len(users) > 1:
+#                 raise Exception(f"Same email: {email_address} exists!")
 
-            # Try to log in
-            user = users[0]
-            login_user(user)
-            return redirect("/?auth=%s" % user.get_id())
-        except Exception as e:
-            rollback_user_registration(user_id)
-            logging.exception(e)
-            return redirect("/?error=%s" % str(e))
+#             # Try to log in
+#             user = users[0]
+#             login_user(user)
+#             return redirect("/?auth=%s" % user.get_id())
+#         except Exception as e:
+#             rollback_user_registration(user_id)
+#             logging.exception(e)
+#             return redirect("/?error=%s" % str(e))
 
-    # User has already registered, try to log in
-    user = users[0]
-    user.access_token = get_uuid()
-    login_user(user)
-    user.save()
-    return redirect("/?auth=%s" % user.get_id())
+#     # User has already registered, try to log in
+#     user = users[0]
+#     user.access_token = get_uuid()
+#     login_user(user)
+#     user.save()
+#     return redirect("/?auth=%s" % user.get_id())
 
 
-@manager.route("/feishu_callback", methods=["GET"])  # noqa: F821
-def feishu_callback():
-    """
-    Feishu OAuth callback endpoint.
-    ---
-    tags:
-      - OAuth
-    parameters:
-      - in: query
-        name: code
-        type: string
-        required: true
-        description: Authorization code from Feishu.
-    responses:
-      200:
-        description: Authentication successful.
-        schema:
-          type: object
-    """
-    import requests
+# @manager.route("/feishu_callback", methods=["GET"])  # noqa: F821
+# def feishu_callback():
+#     """
+#     Feishu OAuth callback endpoint.
+#     ---
+#     tags:
+#       - OAuth
+#     parameters:
+#       - in: query
+#         name: code
+#         type: string
+#         required: true
+#         description: Authorization code from Feishu.
+#     responses:
+#       200:
+#         description: Authentication successful.
+#         schema:
+#           type: object
+#     """
+#     import requests
 
-    app_access_token_res = requests.post(
-        settings.FEISHU_OAUTH.get("app_access_token_url"),
-        data=json.dumps(
-            {
-                "app_id": settings.FEISHU_OAUTH.get("app_id"),
-                "app_secret": settings.FEISHU_OAUTH.get("app_secret"),
-            }
-        ),
-        headers={"Content-Type": "application/json; charset=utf-8"},
-    )
-    app_access_token_res = app_access_token_res.json()
-    if app_access_token_res["code"] != 0:
-        return redirect("/?error=%s" % app_access_token_res)
+#     app_access_token_res = requests.post(
+#         settings.FEISHU_OAUTH.get("app_access_token_url"),
+#         data=json.dumps(
+#             {
+#                 "app_id": settings.FEISHU_OAUTH.get("app_id"),
+#                 "app_secret": settings.FEISHU_OAUTH.get("app_secret"),
+#             }
+#         ),
+#         headers={"Content-Type": "application/json; charset=utf-8"},
+#     )
+#     app_access_token_res = app_access_token_res.json()
+#     if app_access_token_res["code"] != 0:
+#         return redirect("/?error=%s" % app_access_token_res)
 
-    res = requests.post(
-        settings.FEISHU_OAUTH.get("user_access_token_url"),
-        data=json.dumps(
-            {
-                "grant_type": settings.FEISHU_OAUTH.get("grant_type"),
-                "code": request.args.get("code"),
-            }
-        ),
-        headers={
-            "Content-Type": "application/json; charset=utf-8",
-            "Authorization": f"Bearer {app_access_token_res['app_access_token']}",
-        },
-    )
-    res = res.json()
-    if res["code"] != 0:
-        return redirect("/?error=%s" % res["message"])
+#     res = requests.post(
+#         settings.FEISHU_OAUTH.get("user_access_token_url"),
+#         data=json.dumps(
+#             {
+#                 "grant_type": settings.FEISHU_OAUTH.get("grant_type"),
+#                 "code": request.args.get("code"),
+#             }
+#         ),
+#         headers={
+#             "Content-Type": "application/json; charset=utf-8",
+#             "Authorization": f"Bearer {app_access_token_res['app_access_token']}",
+#         },
+#     )
+#     res = res.json()
+#     if res["code"] != 0:
+#         return redirect("/?error=%s" % res["message"])
 
-    if "contact:user.email:readonly" not in res["data"]["scope"].split():
-        return redirect("/?error=contact:user.email:readonly not in scope")
-    session["access_token"] = res["data"]["access_token"]
-    session["access_token_from"] = "feishu"
-    user_info = user_info_from_feishu(session["access_token"])
-    email_address = user_info["email"]
-    users = UserService.query(email=email_address)
-    user_id = get_uuid()
-    if not users:
-        # User isn't try to register
-        try:
-            try:
-                avatar = download_img(user_info["avatar_url"])
-            except Exception as e:
-                logging.exception(e)
-                avatar = ""
-            users = user_register(
-                user_id,
-                {
-                    "access_token": session["access_token"],
-                    "email": email_address,
-                    "avatar": avatar,
-                    "nickname": user_info["en_name"],
-                    "login_channel": "feishu",
-                    "last_login_time": get_format_time(),
-                    "is_superuser": False,
-                },
-            )
-            if not users:
-                raise Exception(f"Fail to register {email_address}.")
-            if len(users) > 1:
-                raise Exception(f"Same email: {email_address} exists!")
+#     if "contact:user.email:readonly" not in res["data"]["scope"].split():
+#         return redirect("/?error=contact:user.email:readonly not in scope")
+#     session["access_token"] = res["data"]["access_token"]
+#     session["access_token_from"] = "feishu"
+#     user_info = user_info_from_feishu(session["access_token"])
+#     email_address = user_info["email"]
+#     users = UserService.query(email=email_address)
+#     user_id = get_uuid()
+#     if not users:
+#         # User isn't try to register
+#         try:
+#             try:
+#                 avatar = download_img(user_info["avatar_url"])
+#             except Exception as e:
+#                 logging.exception(e)
+#                 avatar = ""
+#             users = user_register(
+#                 user_id,
+#                 {
+#                     "access_token": session["access_token"],
+#                     "email": email_address,
+#                     "avatar": avatar,
+#                     "nickname": user_info["en_name"],
+#                     "login_channel": "feishu",
+#                     "last_login_time": get_format_time(),
+#                     "is_superuser": False,
+#                 },
+#             )
+#             if not users:
+#                 raise Exception(f"Fail to register {email_address}.")
+#             if len(users) > 1:
+#                 raise Exception(f"Same email: {email_address} exists!")
 
-            # Try to log in
-            user = users[0]
-            login_user(user)
-            return redirect("/?auth=%s" % user.get_id())
-        except Exception as e:
-            rollback_user_registration(user_id)
-            logging.exception(e)
-            return redirect("/?error=%s" % str(e))
+#             # Try to log in
+#             user = users[0]
+#             login_user(user)
+#             return redirect("/?auth=%s" % user.get_id())
+#         except Exception as e:
+#             rollback_user_registration(user_id)
+#             logging.exception(e)
+#             return redirect("/?error=%s" % str(e))
 
-    # User has already registered, try to log in
-    user = users[0]
-    user.access_token = get_uuid()
-    login_user(user)
-    user.save()
-    return redirect("/?auth=%s" % user.get_id())
+#     # User has already registered, try to log in
+#     user = users[0]
+#     user.access_token = get_uuid()
+#     login_user(user)
+#     user.save()
+#     return redirect("/?auth=%s" % user.get_id())
 
 
 def user_info_from_feishu(access_token):
@@ -464,7 +464,16 @@ def user_profile():
 def user_list():
     if not current_user.is_superuser:
       return get_json_result(settings.RetCode.FORBIDDEN, message='superuser permission required', data=[])
-    return get_json_result(data=[user.to_dict() for user in User.query()])      
+    return get_json_result(data=[user.to_dict() for user in User.query()])
+
+
+@manager.route("/delete/<user_id>", methods=["DELETE"])
+@login_required
+def user_delete(user_id):
+    if not current_user.is_superuser:
+      return get_json_result(settings.RetCode.FORBIDDEN, message='superuser permission required', data=[])
+    rollback_user_registration(user_id)
+    return get_json_result(data='operation done, please check the result')
 
 
 def rollback_user_registration(user_id):
