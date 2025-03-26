@@ -2,11 +2,14 @@ import { useShowDeleteConfirm } from '@/hooks/common-hooks';
 import { useDeleteUser, useFetchUserList } from '@/hooks/user-setting-hooks';
 import { IUserInfo } from '@/interfaces/database/user-setting';
 import { formatDate } from '@/utils/date';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
 import { Button, Table, Tag } from 'antd';
 import { upperFirst } from 'lodash';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import EditModal from './edit-model';
+import { useEditUserModal } from './hooks';
 
 const ColorMap = {
   super: 'red',
@@ -26,6 +29,15 @@ const UserTable = () => {
         await deleteUser(userId);
       },
     });
+  };
+
+  const { editModalVisible, hideEditModal, showEditModal, handleEditOk } =
+    useEditUserModal();
+  const [selectedUser, setSelectedUser] = useState<IUserInfo | null>(null);
+
+  const handleEditClick = (user: IUserInfo) => {
+    setSelectedUser(user);
+    showEditModal();
   };
 
   const columns: TableProps<IUserInfo>['columns'] = [
@@ -63,14 +75,33 @@ const UserTable = () => {
       title: t('common.action'),
       key: 'action',
       render: (_, record) => (
-        <Button
-          type="text"
-          onClick={() => handleDelete(record.id)}
-          disabled={record.is_superuser}
-          // danger
-        >
-          <DeleteOutlined />
-        </Button>
+        <div>
+          <Button
+            type="text"
+            onClick={() => handleEditClick(record)}
+            disabled={record.is_superuser}
+          >
+            <EditOutlined />
+          </Button>
+          <Button
+            type="text"
+            onClick={() => handleDelete(record.id)}
+            disabled={record.is_superuser}
+          >
+            <DeleteOutlined />
+          </Button>
+          <EditModal
+            visible={editModalVisible}
+            hideModal={hideEditModal}
+            onOk={(values) => {
+              if (selectedUser) {
+                handleEditOk(selectedUser.id, values); // 确保使用当前选中用户的ID
+              }
+            }}
+            loading={loading}
+            initialValues={selectedUser || undefined} // 处理null的情况
+          />
+        </div>
       ),
     },
   ];

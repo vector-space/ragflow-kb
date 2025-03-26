@@ -11,6 +11,7 @@ export default {
   user_info: `${api_host}/user/info`,
   user_list: `${api_host}/user/list`,
   deleteUser: (userId: string) => `${api_host}/user/delete/${userId}`,
+  editUser: (userId: string) => `${api_host}/user/edit/${userId}`,
   tenant_info: `${api_host}/user/tenant_info`,
   set_tenant_info: `${api_host}/user/set_tenant_info`,
 

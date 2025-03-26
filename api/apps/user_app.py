@@ -476,6 +476,42 @@ def user_delete(user_id):
     return get_json_result(data='operation done, please check the result')
 
 
+@manager.route("/edit/<user_id>", methods=["POST"])
+@login_required
+def edit_user(user_id):
+    if not current_user.is_superuser:
+      return get_json_result(settings.RetCode.FORBIDDEN, message='superuser permission required', data=[])
+    user = User.query(id=user_id)[0]
+    print('edit_user', user)
+    print('edit_user', request)
+    print('edit_user', request.data)
+    request_data = request.json
+    update_dict = {}
+    if password := request_data.get("new_password"):
+        update_dict["password"] = generate_password_hash(decrypt(password))
+    for k in request_data.keys():
+        if k in [
+            "password",
+            "new_password",
+            "email",
+            "status",
+            "is_superuser",
+            "login_channel",
+            "is_anonymous",
+            "is_active",
+            "is_authenticated",
+            "last_login_time",
+        ]:  # modifying these attributes is not allowed/needed
+            continue
+        update_dict[k] = request_data[k]
+    try:
+        UserService.update_by_id(user.id, update_dict)
+        return get_json_result(data=True)
+    except Exception as e:
+        logging.exception(e)
+        return get_json_result(data=False, message="Update failure!", code=settings.RetCode.EXCEPTION_ERROR)
+
+
 def rollback_user_registration(user_id):
     try:
         UserService.delete_by_id(user_id)

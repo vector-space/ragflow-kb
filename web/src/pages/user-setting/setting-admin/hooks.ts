@@ -1,6 +1,6 @@
-// 注册相关hook use-register-hook.ts
 import { useSetModalState } from '@/hooks/common-hooks';
 import { useRegister } from '@/hooks/login-hooks';
+import { useEditUser } from '@/hooks/user-setting-hooks';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,5 +28,37 @@ export const useRegisterUser = () => {
     hideRegisterModal,
     showRegisterModal,
     handleRegisterOk,
+  };
+};
+
+export const useEditUserModal = () => {
+  const { editUser } = useEditUser();
+  const { t } = useTranslation();
+  const {
+    visible: editModalVisible,
+    hideModal: hideEditModal,
+    showModal: showEditModal,
+  } = useSetModalState();
+
+  const handleEditOk = useCallback(
+    async (userId: string, values: { nickname: string; password?: string }) => {
+      const params = {
+        nickname: values.nickname,
+        ...(values.password && { new_password: values.password }),
+      };
+
+      const code = await editUser({ userId, userInfo: params });
+      if (code === 0) {
+        hideEditModal();
+      }
+    },
+    [editUser, hideEditModal],
+  );
+
+  return {
+    editModalVisible,
+    hideEditModal,
+    showEditModal,
+    handleEditOk,
   };
 };
