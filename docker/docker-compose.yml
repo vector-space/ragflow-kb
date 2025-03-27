@@ -116,7 +116,7 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    image: ${RAGFLOW_IMAGE}
+    image: vectorspace/ragflow-kb:v0.0.3
     ports:
       - ${SVR_HTTP_PORT}:9380
       - 81:80
