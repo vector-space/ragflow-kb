@@ -22,6 +22,7 @@ from flask import Flask
 from werkzeug.security import generate_password_hash
 
 from api.db.services import UserService
+from api.utils import get_uuid, get_format_time
 
 
 @click.command('reset-password', help='Reset the account password.')
@@ -73,6 +74,75 @@ def reset_email(email, new_email, email_confirm):
     UserService.update_user(user[0].id,user_dict)
     click.echo(click.style('Congratulations!, email has been reset.', fg='green'))
 
+
+@click.command('create-superuser', help='Create a superuser account.')
+@click.option('--email', 
+              prompt=True, 
+              default='root@knowledge-base.com',
+              show_default=True,
+              help='Email address for the superuser')
+@click.option('--password', 
+              prompt=True, 
+              hide_input=True,
+              default='123456',
+              show_default=True,
+              help='Password for the superuser')
+@click.option('--password-confirm', 
+              prompt=True, 
+              hide_input=True,
+              default='123456',
+              show_default=True,
+              help='Confirm password')
+@click.option('--nickname',
+              prompt=True,
+              default='管理员',
+              show_default=True,
+              help='Nickname for the superuser')
+def create_superuser(email, password, password_confirm, nickname):
+    # 检查邮箱是否已存在
+    if UserService.query(email=email):
+        click.echo(click.style('Error: Email already registered.', fg='red'))
+        return
+    
+    # # 验证邮箱格式
+    # if not re.match(r"^[\w\._-]+@([\w_-]+\.)+[\w-]{2,4}$", email):
+    #     click.echo(click.style('Error: Invalid email format.', fg='red'))
+    #     return
+
+    # 验证密码一致性
+    if password != password_confirm:
+        click.echo(click.style('Error: Passwords do not match.', fg='red'))
+        return
+
+    # 密码编码和哈希处理
+    encode_password = base64.b64encode(password.encode('utf-8')).decode('utf-8')
+
+    # 创建用户数据
+    user_data = {
+        "id": get_uuid(),
+        "email": email,
+        "nickname": nickname,
+        "password": encode_password,
+        "is_superuser": True,
+        "login_channel": "password",
+        "last_login_time": get_format_time(),
+        "access_token": get_uuid()
+    }
+
+    try:
+        UserService.save(**user_data)
+        # 显示创建结果
+        click.echo(click.style('\nSuperuser created:', fg='green', bold=True))
+        click.echo(click.style(f'{"Email:":<12} {email}', fg='cyan'))
+        click.echo(click.style(f'{"Nickname:":<12} {nickname}', fg='cyan'))
+        click.echo(click.style(f'{"Password:":<12} ', fg='cyan') + 
+                  click.style(password, fg='red', bold=True))
+        click.echo(click.style('⚠️ Password is shown in plain text!', fg='yellow'))
+    except Exception as e:
+        click.echo(click.style(f'Error: {str(e)}', fg='red'))
+
+
 def register_commands(app: Flask):
     app.cli.add_command(reset_password)
     app.cli.add_command(reset_email)
+    app.cli.add_command(create_superuser)
