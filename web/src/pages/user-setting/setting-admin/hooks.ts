@@ -46,7 +46,6 @@ export const useEditUserModal = () => {
         nickname: values.nickname,
         ...(values.password && { new_password: values.password }),
       };
-
       const code = await editUser({ userId, userInfo: params });
       if (code === 0) {
         hideEditModal();

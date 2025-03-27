@@ -90,32 +90,32 @@ const UserTable = () => {
           >
             <DeleteOutlined />
           </Button>
-          <EditModal
-            visible={editModalVisible}
-            hideModal={hideEditModal}
-            onOk={(values) => {
-              if (selectedUser) {
-                handleEditOk(selectedUser.id, values); // 确保使用当前选中用户的ID
-              }
-            }}
-            loading={loading}
-            initialValues={selectedUser || undefined} // 处理null的情况
-          />
         </div>
       ),
     },
   ];
 
   return (
-    <Table<IUserInfo>
-      rowKey="id"
-      columns={columns}
-      dataSource={data}
-      loading={loading}
-      pagination={false}
-      bordered
-      scroll={{ x: 800 }}
-    />
+    <div>
+      <Table<IUserInfo>
+        rowKey="id"
+        columns={columns}
+        dataSource={data}
+        loading={loading}
+        pagination={false}
+        bordered
+        scroll={{ x: 800 }}
+      />
+      <EditModal
+        visible={editModalVisible}
+        hideModal={hideEditModal}
+        onOk={(values) => {
+          handleEditOk(selectedUser.id, values);
+        }}
+        loading={loading}
+        initialValues={selectedUser}
+      />
+    </div>
   );
 };
 

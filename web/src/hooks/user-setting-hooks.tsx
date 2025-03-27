@@ -107,7 +107,7 @@ export const useEditUser = () => {
         message.success(t('message.modified'));
         queryClient.invalidateQueries({ queryKey: ['userList'] });
       }
-      return data?.data ?? [];
+      return data.code; // 返回响应中的code
     },
   });
 

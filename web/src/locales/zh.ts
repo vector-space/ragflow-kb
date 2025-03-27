@@ -563,6 +563,7 @@ General：实体和关系提取提示来自 GitHub - microsoft/graphrag：基于
       sureDeleteUser: '确定要删除该用户吗？',
       deleted: '删除成功',
       editUser: '编辑用户信息',
+      leaveBlank: '空',
 
       team: '团队',
       system: '系统',

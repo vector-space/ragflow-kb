@@ -66,7 +66,7 @@ const EditModal = ({
         </Form.Item>
 
         <Form.Item
-          label={t('common.name')}
+          label={t('setting.nickname')}
           name="nickname"
           rules={[{ required: true }]}
         >
